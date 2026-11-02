@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>To'y Taklifnomasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    :root {
+      --bg-cream: #FAF7F2;
+      --bg-card: #FFFFFF;
+      --primary-dark: #2A1D17;
+      --gold-main: #C59B27;
+      --gold-dark: #8C6A13;
+      --gold-light: #E8CA72;
+      --gold-gradient: linear-gradient(135deg, #B8860B 0%, #E8CA72 50%, #996515 100%);
+      --text-main: #2A1D17;
+      --text-muted: #6B5E55;
+      --shadow: 0 10px 30px rgba(42, 29, 23, 0.08);
+      --border-gold: 1px solid rgba(197, 155, 39, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .mobile-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background: var(--bg-cream);
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      padding-bottom: 50px;
+    }
+
+    /* Modal / Welcome Overlay */
+    #welcomeModal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #FAF7F2;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #welcomeModal.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .modal-card {
+      background: #FFFFFF;
+      border: 2px solid var(--gold-main);
+      border-radius: 20px;
+      padding: 40px 25px;
+      box-shadow: 0 15px 35px rgba(184, 134, 11, 0.15);
+      width: 100%;
+      max-width: 350px;
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      color: var(--gold-dark);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .modal-names {
+      font-family: 'Alex Brush', cursive;
+      font-size: 3rem;
+      color: var(--primary-dark);
+      margin: 15px 0;
+    }
+
+    .open-btn {
+      margin-top: 25px;
+      background: var(--gold-gradient);
+      color: #FFF;
+      border: none;
+      padding: 16px 32px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(197, 155, 39, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(197, 155, 39, 0.6); }
+      70% { transform: scale(1.04); box-shadow: 0 0 0 15px rgba(197, 155, 39, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(197, 155, 39, 0); }
+    }
+
+    /* Music Player */
+    .music-btn {
+      position: fixed;
+      top: 20px; right: 20px;
+      z-index: 900;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: #FFF;
+      border: 2px solid var(--gold-main);
+      color: var(--gold-dark);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .music-btn.playing {
+      animation: spin 4s linear infinite;
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 60px 25px 40px;
+    }
+
+    .hero-subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      color: var(--gold-dark);
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+
+    .hero-names {
+      font-family: 'Alex Brush', cursive;
+      font-size: 3.8rem;
+      color: var(--primary-dark);
+      line-height: 1.1;
+      margin-bottom: 15px;
+    }
+
+    .hero-date {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: var(--gold-dark);
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
+
+    .divider {
+      width: 80px;
+      height: 2px;
+      background: var(--gold-gradient);
+      margin: 25px auto;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      margin: 0 20px 25px;
+      padding: 25px 20px;
+      border-radius: 16px;
+      border: var(--border-gold);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      color: var(--gold-dark);
+      margin-bottom: 15px;
+      letter-spacing: 1px;
+    }
+
+    /* Countdown Timer */
+    .timer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .timer-block {
+      background: #FAF7F2;
+      padding: 12px 5px;
+      border-radius: 10px;
+      border: 1px solid rgba(197, 155, 39, 0.2);
+    }
+
+    .timer-number {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .timer-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Gallery Slider */
+    .slider-container {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--gold-light);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      margin-top: 10px;
+    }
+
+    .slider-wrapper {
+      display: flex;
+      transition: transform 0.4s ease-in-out;
+    }
+
+    .slide {
+      min-width: 100%;
+      height: 260px;
+      position: relative;
+    }
+
+    .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .slide-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(42, 29, 23, 0.7));
+      color: #FFF;
+      padding: 15px 10px 8px;
+      font-size: 0.8rem;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+    }
+
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--gold-main);
+      color: var(--gold-dark);
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.9rem;
+      z-index: 10;
+    }
+
+    .slider-btn.prev { left: 10px; }
+    .slider-btn.next { right: 10px; }
+
+    .dots-container {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #E0D6C8;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .dot.active {
+      background: var(--gold-main);
+      width: 18px;
+      border-radius: 10px;
+    }
+
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: transform 0.2s;
+    }
+
+    .action-btn:active { transform: scale(0.98); }
+
+    .btn-gold {
+      background: var(--gold-gradient);
+      color: #FFF;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--gold-main);
+      color: var(--gold-dark);
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #E0D6C8;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #FAF7F2;
+      color: var(--primary-dark);
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--gold-main);
+      background: #FFF;
+    }
+
+    /* Wishes Wall */
+    .wishes-list {
+      max-height: 250px;
+      overflow-y: auto;
+      text-align: left;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .wish-item {
+      background: #FAF7F2;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border-left: 3px solid var(--gold-main);
+    }
+
+    .wish-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .wish-author {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--gold-dark);
+    }
+
+    .wish-count {
+      font-size: 0.75rem;
+      background: rgba(197, 155, 39, 0.15);
+      color: var(--gold-dark);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+
+    .wish-text {
+      font-size: 0.85rem;
+      color: var(--text-main);
+      margin-top: 6px;
+    }
+
+    /* Photo Upload Box */
+    .file-upload-box {
+      border: 2px dashed var(--gold-main);
+      border-radius: 12px;
+      padding: 20px 15px;
+      background: #FAF7F2;
+      cursor: pointer;
+      position: relative;
+      margin-bottom: 15px;
+      transition: background 0.3s;
+    }
+
+    .file-upload-box:hover {
+      background: #FFF;
+    }
+
+    .file-upload-input {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .photo-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .photo-preview-item {
+      width: 100%;
+      height: 90px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--gold-light);
+    }
+
+    .status-msg {
+      font-size: 0.85rem;
+      margin-top: 10px;
+      color: #27ae60;
+      font-weight: 600;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio Player -->
+  <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=wedding-piano-112677.mp3"></audio>
+  <button class="music-btn" id="musicToggle" title="Musiqa">🎵</button>
+
+  <div class="mobile-container">
+    
+    <!-- Welcome Screen -->
+    <div id="welcomeModal">
+      <div class="modal-card">
+        <div class="modal-title">To'y Taklifnomasi</div>
+        <div class="divider"></div>
+        <div class="modal-names">Jasur & Sevinch</div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">
+          Sizni baxt kunchamizda birga bo'lishga taklif etamiz!
+        </p>
+        <button class="open-btn" id="openBtn">
+          ✉️ TAKLIFNOMANI OCHISH
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Hero -->
+    <div class="hero">
+      <div class="hero-subtitle">Baxtli Kun Taklifi</div>
+      <div class="hero-names">Jasur<br>&<br>Sevinch</div>
+      <div class="divider"></div>
+      <div class="hero-date">28 NOYABR, 2026</div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">Shanba | Soat 18:00 da</p>
+    </div>
+
+    <!-- Gallery (Love Story Slider) -->
+    <div class="card">
+      <div class="card-title">Love Story</div>
+      <div class="slider-container">
+        <div class="slider-wrapper" id="sliderWrapper">
+          <div class="slide">
+            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" alt="Foto 1">
+            <div class="slide-caption">Bizning Ilk Uchrashuv</div>
+          </div>
+          <div class="slide">
+            <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80" alt="Foto 2">
+            <div class="slide-caption">Baxtli Onlar</div>
+          </div>
+          <div class="slide">
+            <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80" alt="Foto 3">
+            <div class="slide-caption">Bir Umrlik Sevgi</div>
+          </div>
+        </div>
+        <button class="slider-btn prev" id="prevSlide">❮</button>
+        <button class="slider-btn next" id="nextSlide">❯</button>
+      </div>
+      <div class="dots-container" id="dotsContainer">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="card">
+      <div class="card-title">Tadbirgacha Qoldi</div>
+      <div class="timer-grid">
+        <div class="timer-block">
+          <div class="timer-number" id="days">00</div>
+          <div class="timer-label">Kun</div>
+        </div>
+        <div class="timer-block">
+          <div class="timer-number" id="hours">00</div>
+          <div class="timer-label">Soat</div>
+        </div>
+        <div class="timer-block">
+          <div class="timer-number" id="minutes">00</div>
+          <div class="timer-label">Daqiqa</div>
+        </div>
+        <div class="timer-block">
+          <div class="timer-number" id="seconds">00</div>
+          <div class="timer-label">Soniya</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Venue & Navigation -->
+    <div class="card">
+      <div class="card-title">Tadbir Manzili</div>
+      <p style="font-weight: 600; font-size: 1.05rem; color: var(--primary-dark);">"Yulduz" Tantanalar Saroyi</p>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Toshkent shahar, Yunusobod tumani, Amir Temur ko'chasi 15-uy</p>
+      
+      <div class="btn-group">
+        <a href="https://maps.google.com" target="_blank" class="action-btn btn-gold">
+          📍 Google Maps orqali ochish
+        </a>
+        <a href="https://yandex.com/maps" target="_blank" class="action-btn btn-outline">
+          🗺️ Yandex Maps orqali ochish
+        </a>
+      </div>
+    </div>
+
+    <!-- Unified Form (RSVP + Wish) -->
+    <div class="card">
+      <div class="card-title">Tashrif va Tilaklar</div>
+      <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 15px;">Iltimos, tashrifingizni tasdiqlang va izoh qoldiring</p>
+      
+      <form id="mainForm">
+        <div class="form-group">
+          <label>Ism va Familiyangiz *</label>
+          <input type="text" class="form-input" id="guestName" placeholder="Masalan: Ali Valiyev" required>
+        </div>
+
+        <div class="form-group">
+          <label>Telefon raqamingiz *</label>
+          <input type="tel" class="form-input" id="guestPhone" placeholder="+998 90 123 45 67" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Necha kishi bo'lib kelasiz?</label>
+          <select class="form-input" id="guestCount">
+            <option value="1 kishi">1 kishi</option>
+            <option value="2 kishi">2 kishi</option>
+            <option value="3+ kishi">3 kishi va undan ko'p</option>
+            <option value="Afsus, kela olmayman">Afsus, kela olmayman</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Yoshlarga tabrik yoki tilaklaringiz</label>
+          <textarea class="form-input" id="guestWish" rows="3" placeholder="Samimiy tilaklaringizni yozing..."></textarea>
+        </div>
+
+        <button type="submit" class="action-btn btn-gold" style="width: 100%; border: none; cursor: pointer;">
+          📩 Javobni va Tilakni Yuborish
+        </button>
+        <div class="status-msg" id="statusMsg">✨ Rahmat! Javobingiz va tilagingiz yuborildi.</div>
+      </form>
+    </div>
+
+    <!-- Wishes List -->
+    <div class="card">
+      <div class="card-title">Mehmonlar Tilaklari</div>
+      <div class="wishes-list" id="wishesList">
+        <div class="wish-item">
+          <div class="wish-header">
+            <span class="wish-author">Sardor & Shahlo</span>
+            <span class="wish-count">2 kishi</span>
+          </div>
+          <div class="wish-text">Qo'sha qariylar! Ikki dunyo saodatini tilaymiz!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📸 FEATURE 5: Live Photo Upload (Mehmonlar Rasmlari) -->
+    <div class="card">
+      <div class="card-title">📸 To'y Suratlarini Ulashing</div>
+      <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 15px;">
+        To'yimizda olgan eng chiroyli rasmlaringizni biz bilan baham ko'ring!
+      </p>
+
+      <form id="photoUploadForm">
+        <div class="form-group">
+          <input type="text" class="form-input" id="photoUploaderName" placeholder="Kim yubormoqda? (Ismingiz)" required>
+        </div>
+
+        <div class="file-upload-box">
+          <input type="file" class="file-upload-input" id="photoInput" accept="image/*" multiple required>
+          <div style="font-size: 1.8rem; color: var(--gold-dark);">📷</div>
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--gold-dark); margin-top: 5px;" id="uploadBoxLabel">
+            Rasmlarni tanlash uchun bosing
+          </div>
+          <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;">
+            (Bir nechta rasm tanlash mumkin)
+          </div>
+        </div>
+
+        <div class="photo-preview-grid" id="photoPreviewGrid"></div>
+
+        <button type="submit" class="action-btn btn-outline" style="width: 100%; margin-top: 15px; cursor: pointer;">
+          📤 Rasmlarni Yuborish
+        </button>
+        <div class="status-msg" id="photoStatusMsg">✨ Rahmat! Rasmlaringiz yuborildi.</div>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    // --- TELEGRAM BOT CONFIG ---
+    const TELEGRAM_BOT_TOKEN = '8839760940:AAFiOIKYoA6ewda4bQGnRhIJ5HR2Ewx1hCw'; 
+    const TELEGRAM_CHAT_ID = '7633572260';
+
+    // --- Audio Player ---
+    const bgMusic = document.getElementById('bgMusic');
+    const musicToggle = document.getElementById('musicToggle');
+    let isPlaying = false;
+
+    function toggleMusic() {
+      if (isPlaying) {
+        bgMusic.pause();
+        musicToggle.classList.remove('playing');
+      } else {
+        bgMusic.play().catch(e => console.log('Autoplay constraint'));
+        musicToggle.classList.add('playing');
+      }
+      isPlaying = !isPlaying;
+    }
+
+    musicToggle.addEventListener('click', toggleMusic);
+
+    // --- Welcome Modal & Confetti ---
+    const openBtn = document.getElementById('openBtn');
+    const welcomeModal = document.getElementById('welcomeModal');
+
+    openBtn.addEventListener('click', () => {
+      welcomeModal.classList.add('hidden');
+      toggleMusic();
+      
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#C59B27', '#E8CA72', '#8C6A13']
+        });
+      }
+    });
+
+    // --- Love Story Photo Slider Logic ---
+    const sliderWrapper = document.getElementById('sliderWrapper');
+    const dots = document.querySelectorAll('.dot');
+    const prevBtn = document.getElementById('prevSlide');
+    const nextBtn = document.getElementById('nextSlide');
+    let currentSlide = 0;
+    const totalSlides = 3;
+
+    function goToSlide(index) {
+      currentSlide = (index + totalSlides) % totalSlides;
+      sliderWrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentSlide);
+      });
+    }
+
+    nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+    prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => goToSlide(i)));
+
+    setInterval(() => goToSlide(currentSlide + 1), 5000);
+
+    // --- Countdown Timer ---
+    const weddingDate = new Date('2026-11-28T18:00:00').getTime();
+
+    function updateTimer() {
+      const now = new Date().getTime();
+      const distance = weddingDate - now;
+
+      if (distance < 0) {
+        document.getElementById('days').innerText = '00';
+        document.getElementById('hours').innerText = '00';
+        document.getElementById('minutes').innerText = '00';
+        document.getElementById('seconds').innerText = '00';
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+      document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+      document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
+      document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // --- Telegram Text Sender ---
+    async function sendTelegramMessage(text) {
+      if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') {
+        console.log("Telegram Bot sozlanmagan. Xabar:", text);
+        return true;
+      }
+      
+      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+      try {
+        await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: text,
+            parse_mode: 'HTML'
+          })
+        });
+        return true;
+      } catch (err) {
+        console.error("Telegram API xatosi:", err);
+        return false;
+      }
+    }
+
+    // --- Telegram Photo Sender ---
+    async function sendTelegramPhoto(file, caption) {
+      if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') {
+        console.log("Telegram Bot sozlanmagan. Rasm yuborilmadi:", file.name);
+        return true;
+      }
+
+      const formData = new FormData();
+      formData.append('chat_id', TELEGRAM_CHAT_ID);
+      formData.append('photo', file);
+      formData.append('caption', caption);
+      formData.append('parse_mode', 'HTML');
+
+      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+      try {
+        await fetch(url, { method: 'POST', body: formData });
+        return true;
+      } catch (err) {
+        console.error("Telegram Photo API xatosi:", err);
+        return false;
+      }
+    }
+
+    // --- Unified Form Submit ---
+    const mainForm = document.getElementById('mainForm');
+    const statusMsg = document.getElementById('statusMsg');
+    const wishesList = document.getElementById('wishesList');
+
+    mainForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('guestName').value.trim();
+      const phone = document.getElementById('guestPhone').value.trim();
+      const count = document.getElementById('guestCount').value;
+      const wish = document.getElementById('guestWish').value.trim() || 'Izoh qoldirilmadi';
+
+      const telegramMessage = 
+        `<b>📬 YANGI TO'Y TAKLIFNOMASI JAVOBI</b>\n\n` +
+        `<b>👤 Mehmon:</b> ${name}\n` +
+        `<b>📞 Telefon:</b> ${phone}\n` +
+        `<b>👥 Kishilar soni:</b> ${count}\n` +
+        `<b>💬 Tabrik so'zi:</b> ${wish}`;
+      
+      await sendTelegramMessage(telegramMessage);
+
+      if (wish && wish !== 'Izoh qoldirilmadi') {
+        const wishItem = document.createElement('div');
+        wishItem.className = 'wish-item';
+        
+        wishItem.innerHTML = `
+          <div class="wish-header">
+            <span class="wish-author">${name}</span>
+            <span class="wish-count">${count}</span>
+          </div>
+          <div class="wish-text">${wish}</div>
+        `;
+        wishesList.prepend(wishItem);
+      }
+
+      statusMsg.style.display = 'block';
+      mainForm.reset();
+
+      setTimeout(() => {
+        statusMsg.style.display = 'none';
+      }, 4000);
+    });
+
+    // --- Photo Upload Handler ---
+    const photoInput = document.getElementById('photoInput');
+    const photoPreviewGrid = document.getElementById('photoPreviewGrid');
+    const uploadBoxLabel = document.getElementById('uploadBoxLabel');
+    const photoUploadForm = document.getElementById('photoUploadForm');
+    const photoStatusMsg = document.getElementById('photoStatusMsg');
+
+    photoInput.addEventListener('change', () => {
+      photoPreviewGrid.innerHTML = '';
+      const files = photoInput.files;
+
+      if (files.length > 0) {
+        uploadBoxLabel.innerText = `${files.length} ta rasm tanlandi`;
+        
+        Array.from(files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'photo-preview-item';
+            photoPreviewGrid.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
+      } else {
+        uploadBoxLabel.innerText = 'Rasmlarni tanlash uchun bosing';
+      }
+    });
+
+    photoUploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const uploaderName = document.getElementById('photoUploaderName').value.trim();
+      const files = photoInput.files;
+
+      if (files.length === 0) return;
+
+      photoStatusMsg.innerText = '⏳ Rasmlar yuborilmoqda...';
+      photoStatusMsg.style.display = 'block';
+
+      for (let i = 0; i < files.length; i++) {
+        const caption = `<b>🖼️ Mehmon Rasmi (${i + 1}/${files.length})</b>\n<b>Yubordi:</b> ${uploaderName}`;
+        await sendTelegramPhoto(files[i], caption);
+      }
+
+      photoStatusMsg.innerText = '✨ Rahmat! Rasmlaringiz yuborildi.';
+      photoUploadForm.reset();
+      photoPreviewGrid.innerHTML = '';
+      uploadBoxLabel.innerText = 'Rasmlarni tanlash uchun bosing';
+
+      setTimeout(() => {
+        photoStatusMsg.style.display = 'none';
+      }, 4000);
+    });
+  </script>
+</body>
+</html>
